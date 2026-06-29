@@ -1,18 +1,112 @@
-# Salesforce DX Project: Next Steps
+# Salesforce Inspection App
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+Proyecto desarrollado con Salesforce DX para practicar desarrollo en Apex, automatizaciones con Triggers y buenas prácticas de arquitectura en la plataforma.
 
-## How Do You Plan to Deploy Your Changes?
+La aplicación simula un sistema de gestión de inspecciones, donde se asignan inspectores a distintas inspecciones, se generan tareas automáticamente y se registran auditorías cuando hay cambios.
 
-Do you want to deploy a set of changes, or create a self-contained application? Choose a [development model](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models).
+---
 
-## Configure Your Salesforce DX Project
+## Descripción del negocio
 
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
+El sistema permite gestionar inspecciones realizadas a clientes.
 
-## Read All About It
+Cada inspección:
 
-- [Salesforce Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-- [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_intro.htm)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
+- Se asigna a un inspector
+- Puede generar tareas automáticamente
+- Registra cambios de asignación para auditoría
+
+Relaciones principales:
+
+- Inspection__c → Customer__c
+- Inspection__c → Inspector__c
+- Inspection_Audit__c → Inspection__c
+
+---
+
+## Lógica de negocio
+
+### Arquitectura utilizada
+
+Se implementó una arquitectura basada en capas:
+
+Trigger → Handler → Service
+
+### InspectionTrigger
+
+Dispara la lógica en eventos de `Inspection__c`.
+
+### InspectionHandler
+
+Centraliza la lógica según el contexto del trigger:
+
+- before insert
+- after insert
+- after update
+
+### InspectionService
+
+Contiene la lógica principal del negocio:
+
+- Asigna estado por defecto “Pending”
+- Valida que la fecha de inspección no sea anterior a hoy
+- Crea tareas automáticamente al asignar inspecciones
+- Crea tareas cuando cambia el inspector
+- Registra auditoría de cambios de inspector
+
+---
+
+## Reglas de negocio
+
+- La fecha de inspección no puede ser anterior a hoy
+- Si el estado está vacío, se asigna “Pending” automáticamente
+- Se crea una tarea cuando se asigna una inspección
+- Se crea una tarea cuando cambia el inspector
+- Se registra auditoría cuando cambia el inspector
+- Todo inspector debe tener un usuario de Salesforce asociado
+
+---
+
+## Validaciones
+
+Se implementó una regla de validación en `Inspector__c`:
+
+- El campo `Salesforce_User__c` es obligatorio
+
+Esto asegura que siempre se pueda asignar correctamente la tarea a un usuario de Salesforce.
+
+---
+
+## Tests
+
+El proyecto incluye tests en Apex que validan:
+
+- Creación de inspecciones
+- Generación automática de tareas
+- Validación de fechas incorrectas
+- Cambio de inspector
+- Cobertura de lógica de negocio
+
+Los tests siguen el patrón:
+
+- Arrange (preparación)
+- Act (ejecución)
+- Assert (validación)
+
+---
+
+## Tecnologías utilizadas
+
+- Apex
+- Salesforce Objects
+- Triggers
+- Validation Rules
+- Salesforce DX
+- Git
+- ESLint / Prettier
+- Jest (configuración del proyecto)
+
+---
+
+
+
