@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Require_Salesforce_User</fullName>
+    <active>true</active>
+    <errorConditionFormula>ISBLANK(Salesforce_User__c )</errorConditionFormula>
+    <errorDisplayField>Salesforce_User__c</errorDisplayField>
+    <errorMessage>Debe seleccionar un usuario de Salesforce para este inspector.</errorMessage>
+</ValidationRule>
