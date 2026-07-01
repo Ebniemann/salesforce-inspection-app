@@ -75,7 +75,7 @@ private class InspectionServiceTest {
         Test.stopTest();
 
         //Assert
-        Task tasks = [
+        List<Task> tasks = [
             SELECT Id, Subject, WhatId, OwnerId, ActivityDate
             FROM Task
             WHERE WhatId = :inspection.Id
@@ -88,18 +88,18 @@ private class InspectionServiceTest {
         );
         System.assertEquals(
             inspection.Id,
-            tasks.WhatId,
+            tasks[0].WhatId,
             'No se creo en la inspeccion correcta'
         );
 
         System.assertEquals(
            inspector.Salesforce_User__c,
-            tasks.OwnerId
+            tasks[0].OwnerId
         );
 
         System.assertEquals(
            inspection.Inspection_Date__c,
-            tasks.ActivityDate
+            tasks[0].ActivityDate
         );  
     }
 
@@ -141,11 +141,9 @@ private class InspectionServiceTest {
         Test.stopTest();
     }
 
-    
     @isTest
     static void taskCreatedWhenInspectorChange() {
-       
-       
+          
         //Arrage
         Customer__c customer = new Customer__c(
             Name = 'name'
@@ -200,6 +198,94 @@ private class InspectionServiceTest {
         tasks[0].OwnerId,
         'La tarea debe asignarse al nuevo inspector'
         );
+    }
+
+    @isTest
+    static void bulkInspectionInsertCreatesTasks() {
+
+        // Arrange
+        Customer__c customer = new Customer__c(
+            Name = 'Bulk Customer'
+        );
+        insert customer;
+
+        Inspector__c inspector = new Inspector__c(
+            Name = 'Bulk Inspector',
+            Salesforce_User__c = UserInfo.getUserId()
+        );
+        insert inspector;
+
+        List<Inspection__c> inspections = new List<Inspection__c>();
+
+        for (Integer i = 0; i < 10; i++) {
+            inspections.add(new Inspection__c(
+                Name = 'Inspection ' + i,
+                Customer__c = customer.Id,
+                Inspector__c = inspector.Id,
+                Inspection_Date__c = Date.today().addDays(1)
+            ));
+        }
+
+        // Act
+        Test.startTest();
+        insert inspections;
+        Test.stopTest();
+
+        // Assert
+        List<Task> tasks = [
+            SELECT Id, WhatId
+            FROM Task
+            WHERE WhatId IN :inspections
+        ];
+
+        System.assertEquals(
+            inspections.size(),
+            tasks.size(),
+            'Debe crearse una tarea por cada inspección insertada.'
+        );
+    }
+    @isTest
+    static void bulkInspectionInsert (){
+        //Arrage 
+        Customer__c customer = new Customer__c(
+            Name = 'Bulk Customer'
+        );
+        insert customer;
+
+        Inspector__c inspector = new Inspector__c(
+            Name = 'Bulk Inspector',
+            Salesforce_User__c = UserInfo.getUserId()
+        );
+        insert inspector;
+
+        List<Inspection__c> inspections = new List<Inspection__c>();
+
+        for(Integer i = 0; i < 10; i++){
+            inspections.add(new Inspection__c(
+                Name = 'Bulk Inspection',
+                Customer__c = customer.Id,
+                Inspector__c = inspector.Id,
+                Inspection_Date__c = Date.today().addDays(1)
+
+            ));
+        }
+
+        Test.startTest();
+        insert inspections;
+        Test.stopTest();
+
+        List<Task> task = [
+            SELECT id, WhatId
+            FROM Task
+            WHERE WhatId IN :inspections
+        ];
+        
+        System.assertEquals(
+            10, 
+            task.size(), 
+            'Debe crear una tarea por cada inspeccion en bulk insert'
+            );
+
     }
 
 }

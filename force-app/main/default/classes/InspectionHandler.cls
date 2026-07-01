@@ -15,7 +15,6 @@ public with sharing class InspectionHandler {
     
         if (Trigger.isAfter && Trigger.isUpdate) {
             InspectionService.afterUpdate(newList, oldMap);
-            InspectionService.createAudit(newList, oldMap);
         }
     }
     
