@@ -1,11 +1,9 @@
+
 @isTest
 private class InspectionServiceTest {
 
-    @isTest
-    static void statusInInspectionCreate(){
-        
-        //Arrage
-
+    @TestSetup
+    static void setupData(){
         Customer__c customer = new Customer__c(
             Name = 'name'
         );
@@ -18,6 +16,23 @@ private class InspectionServiceTest {
         );
 
         insert inspector;
+    }
+
+    @isTest
+    static void statusInInspectionCreate(){
+        
+        //Arrage
+        Customer__c customer =[
+            SELECT Id
+            FROM Customer__c
+            LIMIT 1
+        ];
+
+        Inspector__c inspector = [
+            SELECT Id, Salesforce_User__c
+            FROM Inspector__c
+            LIMIT 1
+        ];
 
         Inspection__c inspection = new Inspection__c(
             Customer__c = customer.Id,
@@ -43,23 +58,24 @@ private class InspectionServiceTest {
         System.assertEquals(
             'Pending',
             ins.Status__c,
-            'La cuenta no puede tener el Status in blanck'
+            'El estado por defecto de la inspección debe ser Pending.'
         );
     }
 
     @isTest
     static void taskCreatedWhenCreateInspection(){
         //Arrage
-        Customer__c customer = new Customer__c(
-            Name = 'name'
-        );
-        insert customer;
+        Customer__c customer =[
+            SELECT Id
+            FROM Customer__c
+            LIMIT 1
+        ];
 
-        Inspector__c inspector = new Inspector__c(
-            Name = 'name',
-            Salesforce_User__c = UserInfo.getUserId()
-        );
-        insert inspector;
+        Inspector__c inspector = [
+            SELECT Id, Salesforce_User__c
+            FROM Inspector__c
+            LIMIT 1
+        ];
 
         Inspection__c inspection = new Inspection__c(
             Name = 'Inspection test',
@@ -106,18 +122,17 @@ private class InspectionServiceTest {
     @isTest
     static void failedDateInInspectionCreate(){
         //Arrage
-        Customer__c customer = new Customer__c(
-            Name = 'name'
-        );
+        Customer__c customer =[
+            SELECT Id
+            FROM Customer__c
+            LIMIT 1
+        ];
 
-        insert customer;
-
-        Inspector__c inspector = new Inspector__c(
-            Name = 'name',
-            Salesforce_User__c = UserInfo.getUserId()
-        );
-
-        insert inspector;
+        Inspector__c inspector = [
+            SELECT Id, Salesforce_User__c
+            FROM Inspector__c
+            LIMIT 1
+        ];
 
         Inspection__c inspection = new Inspection__c(
             Name = 'Inspection test',
@@ -145,10 +160,11 @@ private class InspectionServiceTest {
     static void taskCreatedWhenInspectorChange() {
           
         //Arrage
-        Customer__c customer = new Customer__c(
-            Name = 'name'
-        );
-        insert customer;
+        Customer__c customer =[
+            SELECT Id
+            FROM Customer__c
+            LIMIT 1
+        ];
 
         Inspector__c inspectorA = new Inspector__c(
             Name = 'name A',
@@ -201,19 +217,20 @@ private class InspectionServiceTest {
     }
 
     @isTest
-    static void bulkInspectionInsertCreatesTasks() {
+    static void bulkInsertCreatesOneTaskInspection() {
 
         // Arrange
-        Customer__c customer = new Customer__c(
-            Name = 'Bulk Customer'
-        );
-        insert customer;
+        Customer__c customer =[
+            SELECT Id
+            FROM Customer__c
+            LIMIT 1
+        ];
 
-        Inspector__c inspector = new Inspector__c(
-            Name = 'Bulk Inspector',
-            Salesforce_User__c = UserInfo.getUserId()
-        );
-        insert inspector;
+        Inspector__c inspector = [
+            SELECT Id, Salesforce_User__c
+            FROM Inspector__c
+            LIMIT 1
+        ];
 
         List<Inspection__c> inspections = new List<Inspection__c>();
 
@@ -244,48 +261,75 @@ private class InspectionServiceTest {
             'Debe crearse una tarea por cada inspección insertada.'
         );
     }
-    @isTest
-    static void bulkInspectionInsert (){
-        //Arrage 
-        Customer__c customer = new Customer__c(
-            Name = 'Bulk Customer'
-        );
-        insert customer;
 
-        Inspector__c inspector = new Inspector__c(
-            Name = 'Bulk Inspector',
+    @isTest
+    static void createAudit(){
+         // Arrange
+         Customer__c customer =[
+            SELECT Id
+            FROM Customer__c
+            LIMIT 1
+        ];
+
+        Inspector__c inspectorA = [
+            SELECT Id, Salesforce_User__c
+            FROM Inspector__c
+            LIMIT 1
+        ];
+
+        Inspector__c inspectorB = new Inspector__c(
+            Name = 'name B',
             Salesforce_User__c = UserInfo.getUserId()
         );
-        insert inspector;
+        insert inspectorB;
 
-        List<Inspection__c> inspections = new List<Inspection__c>();
+        Inspection__c inspection = new Inspection__c(
+            Name = 'Inspection - Audit',
+            Customer__c = customer.Id,
+            Inspector__c = inspectorA.Id,
+            Inspection_Date__c = Date.today().addDays(1)
+        );
+        insert inspection;
 
-        for(Integer i = 0; i < 10; i++){
-            inspections.add(new Inspection__c(
-                Name = 'Bulk Inspection',
-                Customer__c = customer.Id,
-                Inspector__c = inspector.Id,
-                Inspection_Date__c = Date.today().addDays(1)
-
-            ));
-        }
-
+        // Cambiar el inspector para disparar la auditoría
+        //Act
         Test.startTest();
-        insert inspections;
+       
+        inspection.Inspector__c = inspectorB.Id;
+        update inspection;
+       
         Test.stopTest();
 
-        List<Task> task = [
-            SELECT id, WhatId
-            FROM Task
-            WHERE WhatId IN :inspections
+        //assert
+        List <Inspection_Audit__c> audits = [
+            SELECT Id, Inspection__c, Old_Inspector__c, New_Inspector__c, Change_Date__c
+            FROM Inspection_Audit__c
+            WHERE Inspection__c = :inspection.Id
         ];
-        
+
+        // que se haya creado la auditoria
         System.assertEquals(
-            10, 
-            task.size(), 
-            'Debe crear una tarea por cada inspeccion en bulk insert'
-            );
+            1, 
+            audits.size()
+        );
+      
+        // que el inspector viejo sea A
+        System.assertEquals(
+            inspectorA, 
+            audits[0].Old_Inspector__c.inspectorA
+        );
 
+        // que el inspector nuevo sea B
+        System.assertEquals(
+            inspectorB, 
+            audits[0].New_Inspector__c.inspectorB
+        );
+       
+        // que date no sea un campo vacio
+        System.assertNotEquals(
+            null, 
+            audits[0].Change_Date__c
+        );
     }
-
+   
 }
