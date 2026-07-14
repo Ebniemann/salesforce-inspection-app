@@ -61,6 +61,12 @@ Las responsabilidades incluyen:
 - Todo inspector debe tener un usuario de Salesforce asociado
 - Cuando se completa una inspección, la fecha de la última inspección del cliente se actualiza automáticamente mediante un flujo activado por registro.
 
+<img width="984" height="721" alt="Captura de pantalla 2026-07-14 a la(s) 3 06 18 p  m" src="https://github.com/user-attachments/assets/a2c6d25e-82b2-4344-8d68-0dacf0e0eaab" />
+
+<img width="1019" height="576" alt="Captura de pantalla 2026-07-14 a la(s) 3 09 09 p  m" src="https://github.com/user-attachments/assets/ab195688-4bae-4b42-8b63-8fecec91ea2a" />
+
+<img width="478" height="620" alt="Captura de pantalla 2026-07-14 a la(s) 3 08 43 p  m" src="https://github.com/user-attachments/assets/535e1c19-1a3a-4132-aa04-7c0e62607ef4" />
+
 ---
 
 ## Automatización
@@ -80,6 +86,9 @@ Flow
 Se implementó un Record-Triggered Flow que actualiza el campo Last Inspection Date del cliente cuando una inspección cambia su estado a Completed.
 
 Esta funcionalidad fue implementada intencionalmente mediante Flow para demostrar el uso combinado de herramientas declarativas y desarrollo en Apex.
+
+<img width="435" height="695" alt="Captura de pantalla 2026-07-14 a la(s) 1 41 00 p  m" src="https://github.com/user-attachments/assets/b64c2389-9a3a-4cb2-b739-52295e048654" />
+
 
 ## Validación
 
@@ -104,6 +113,8 @@ Las pruebas utilizan:
 Test.startTest()
 Test.stopTest()
 Patrón Arrange / Act / Assert
+
+<img width="1109" height="423" alt="Captura de pantalla 2026-07-14 a la(s) 1 24 07 p  m" src="https://github.com/user-attachments/assets/92484ba8-9a57-4c77-a8a8-2c901f4f03ae" />
 
 ---
 
