@@ -8,8 +8,8 @@
         <dataType>String</dataType>
         <expression>&quot;Inspección completada -&quot; &amp; {!$Record.Name}</expression>
     </formulas>
-    <interviewLabel>Inspesction Completed {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>Inspesction Completed</label>
+    <interviewLabel>Inspection Completed {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Inspection Completed</label>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>

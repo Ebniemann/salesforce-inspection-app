@@ -1,4 +1,3 @@
-
 @isTest
 private class InspectionServiceTest {
 
@@ -155,6 +154,7 @@ private class InspectionServiceTest {
         }
         Test.stopTest();
     }
+    
 
     @isTest
     static void taskCreatedWhenInspectorChange() {
@@ -262,7 +262,7 @@ private class InspectionServiceTest {
         );
     }
 
-    @isTest
+    @isTest 
     static void createAudit(){
          // Arrange
          Customer__c customer =[
@@ -293,43 +293,43 @@ private class InspectionServiceTest {
 
         // Cambiar el inspector para disparar la auditoría
         //Act
-        Test.startTest();
+            Test.startTest();
        
-        inspection.Inspector__c = inspectorB.Id;
-        update inspection;
+                inspection.Inspector__c = inspectorB.Id;
+                update inspection;
        
-        Test.stopTest();
+            Test.stopTest();
 
-        //assert
-        List <Inspection_Audit__c> audits = [
-            SELECT Id, Inspection__c, Old_Inspector__c, New_Inspector__c, Change_Date__c
-            FROM Inspection_Audit__c
-            WHERE Inspection__c = :inspection.Id
-        ];
+            //assert
+            List <Inspection_Audit__c> audits = [
+                SELECT Id, Inspection__c, Old_Inspector__c, New_Inspector__c, Change_Date__c
+                FROM Inspection_Audit__c
+                WHERE Inspection__c = :inspection.Id
+            ];
 
-        // que se haya creado la auditoria
-        System.assertEquals(
-            1, 
-            audits.size()
-        );
+            // que se haya creado la auditoria
+            System.assertEquals(
+                1, 
+                audits.size()
+            );
       
         // que el inspector viejo sea A
-        System.assertEquals(
-            inspectorA, 
-            audits[0].Old_Inspector__c.inspectorA
-        );
+            System.assertEquals(
+                inspectorA.Id, 
+                audits[0].Old_Inspector__c
+            );
 
         // que el inspector nuevo sea B
-        System.assertEquals(
-            inspectorB, 
-            audits[0].New_Inspector__c.inspectorB
-        );
+            System.assertEquals(
+                inspectorB.Id,
+                audits[0].New_Inspector__c
+            );
        
         // que date no sea un campo vacio
-        System.assertNotEquals(
-            null, 
-            audits[0].Change_Date__c
-        );
+            System.assertNotEquals(
+                null, 
+                audits[0].Change_Date__c
+            );
     }
    
 }
