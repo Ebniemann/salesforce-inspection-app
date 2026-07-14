@@ -38,6 +38,7 @@ Centraliza la lógica según el contexto del trigger:
 - before insert
 - after insert
 - after update
+- before update
 
 ### InspectionService
 
