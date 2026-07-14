@@ -1,8 +1,6 @@
 # Salesforce Inspection App
 
-Proyecto desarrollado con Salesforce DX para practicar desarrollo en Apex, automatizaciones con Triggers y buenas prácticas de arquitectura en la plataforma.
-
-La aplicación simula un sistema de gestión de inspecciones, donde se asignan inspectores a distintas inspecciones, se generan tareas automáticamente y se registran auditorías cuando hay cambios.
+Este proyecto de Salesforce se desarrolló para practicar el desarrollo con Apex, la automatización de Salesforce y las mejores prácticas de la plataforma. Esta aplicación simula un sistema de gestión de inspecciones donde las inspecciones se asignan a los inspectores, las reglas de negocio se aplican automáticamente, se generan registros de auditoría cuando cambian las asignaciones y los clientes se actualizan mediante un flujo activado por registro.
 
 ---
 
@@ -22,9 +20,6 @@ Relaciones principales:
 - Inspection__c → Inspector__c
 - Inspection_Audit__c → Inspection__c
 
----
-
-## Lógica de negocio
 
 ### Arquitectura utilizada
 
@@ -46,13 +41,13 @@ Centraliza la lógica según el contexto del trigger:
 
 ### InspectionService
 
-Contiene la lógica principal del negocio:
-
-- Asigna estado por defecto “Pending”
-- Valida que la fecha de inspección no sea anterior a hoy
-- Crea tareas automáticamente al asignar inspecciones
-- Crea tareas cuando cambia el inspector
-- Registra auditoría de cambios de inspector
+El servicio contiene toda la lógica de negocio. 
+Las responsabilidades incluyen: 
+- Asignar estado predeterminado. 
+- Validar fechas de inspección. 
+- Crear tareas. 
+- Crear registros de auditoría. 
+- Admitir operaciones masivas mediante colecciones.
 
 ---
 
@@ -64,16 +59,31 @@ Contiene la lógica principal del negocio:
 - Se crea una tarea cuando cambia el inspector
 - Se registra auditoría cuando cambia el inspector
 - Todo inspector debe tener un usuario de Salesforce asociado
+- Cuando se completa una inspección, la fecha de la última inspección del cliente se actualiza automáticamente mediante un flujo activado por registro.
 
 ---
 
-## Validaciones
+## Automatización
+Apex
 
-Se implementó una regla de validación en `Inspector__c`:
+Las siguientes funcionalidades fueron implementadas mediante Apex:
 
-- El campo `Salesforce_User__c` es obligatorio
+- Trigger
+- Handler
+- Service Layer
+- Validaciones de negocio
+- Creación automática de tareas
+- Registro de auditorías
 
-Esto asegura que siempre se pueda asignar correctamente la tarea a un usuario de Salesforce.
+Flow
+
+Se implementó un Record-Triggered Flow que actualiza el campo Last Inspection Date del cliente cuando una inspección cambia su estado a Completed.
+
+Esta funcionalidad fue implementada intencionalmente mediante Flow para demostrar el uso combinado de herramientas declarativas y desarrollo en Apex.
+
+## Validación
+
+Una regla de validación garantiza que cada registro de Inspector__c tenga un usuario de Salesforce asociado antes de poder guardarlo. Esto garantiza que las tareas creadas automáticamente siempre tengan un propietario válido.
 
 ---
 
@@ -81,30 +91,32 @@ Esto asegura que siempre se pueda asignar correctamente la tarea a un usuario de
 
 El proyecto incluye tests en Apex que validan:
 
-- Creación de inspecciones
+- Asignación del estado por defecto.
 - Generación automática de tareas
 - Validación de fechas incorrectas
 - Cambio de inspector
-- Cobertura de lógica de negocio
+- Registro de auditorías
+- Inserciones masivas (Bulk Insert)
 
-Los tests siguen el patrón:
+Las pruebas utilizan:
 
-- Arrange (preparación)
-- Act (ejecución)
-- Assert (validación)
+@TestSetup
+Test.startTest()
+Test.stopTest()
+Patrón Arrange / Act / Assert
 
 ---
 
 ## Tecnologías utilizadas
 
-- Apex
-- Salesforce Objects
-- Triggers
-- Validation Rules
 - Salesforce DX
+- Apex
+- Triggers
+- SOQL
+- Record-Triggered Flow
+- Validation Rules
+- Custom Objects
 - Git
-- ESLint / Prettier
-- Jest (configuración del proyecto)
 
 ---
 
