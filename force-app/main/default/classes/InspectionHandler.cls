@@ -16,6 +16,10 @@ public with sharing class InspectionHandler {
         if (Trigger.isAfter && Trigger.isUpdate) {
             InspectionService.afterUpdate(newList, oldMap);
         }
+
+        if(Trigger.isBefore && Trigger.isUpdate){
+            InspectionService.beforeUpdate(newList);
+        }
     }
     
 }

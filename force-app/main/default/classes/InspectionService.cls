@@ -13,11 +13,20 @@ public with sharing class InspectionService {
                 ins.Inspection_Date__c != null &&
                 ins.Inspection_Date__c < Date.today()
               ){
-                ins.addError('la fecha de inspección no puede ser menor a hoy');
+                ins.addError('La fecha de inspección no puede ser menor a hoy');
             }
         }
     }
 
+    public static void beforeUpdate(List <Inspection__c> newList){
+        for(Inspection__c ins : newList){
+        if (ins.Inspection_Date__c != null &&
+            ins.Inspection_Date__c < Date.today()
+            ){
+            ins.addError('La fecha de inspeccion no puede ser menor a hoy');
+        }
+    }
+   }
     //Metodo que obtiene los inspectores asociados a los IDs recibidos. 
     private static Map<Id, Inspector__c> getInspector(Set<Id> inspectorIds){
         if(inspectorIds == null || inspectorIds.isEmpty()){
@@ -121,27 +130,4 @@ public with sharing class InspectionService {
         }
     }
 
-    // public static void createAudit(List<Inspection__c> newList, Map<Id, Inspection__c> oldMap){
-    //     List<Inspection_Audit__c> audits = new List<Inspection_Audit__c>();
-
-    //     for(Inspection__c ins : newList){
-            
-    //         Inspection__c oldIns = oldMap.get(ins.Id);
-            
-    //         if(oldIns != null && ins.Inspector__c != oldIns.Inspector__c){
-                
-    //             Inspection_Audit__c audit = new Inspection_Audit__c(
-    //                 Inspection__c = ins.Id,
-    //                 Old_Inspector__c = oldIns.Inspector__c,
-    //                 New_Inspector__c = ins.Inspector__c,
-    //                 Change_Date__c = System.now()
-    //             );
-    //             audits.add(audit);
-    //         }
-    //     }
-
-    //     if(!audits.isEmpty()){
-    //         insert audits;
-    //     }
-    //  }
 }
